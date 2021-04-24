@@ -1,27 +1,19 @@
 import React, { useState }from 'react';
 import Photo from './Photo';
+import Pagination from './Pagination';
 
 const Feed = ({ images }) => {
-  const firstRow = images.slice(0,5);
-  const secondRow = images.slice(5,10)
 
   return (
-  <div className="container">
-    <div className="row">
-      {
-        firstRow.map(image => {
-          return <Photo image={image}/>
-        })
-      }
+    <div className="container">
+      <div className="row text-center text-lg-left">
+        {
+          images.map(image => {
+            return <Photo key={image.id} image={image}/>
+          })
+        }
+      </div>
     </div>
-    <div className="row">
-    {
-        secondRow.map(image => {
-          return <Photo image={image}/>
-        })
-      }
-    </div>
-  </div>
   )
 };
 
