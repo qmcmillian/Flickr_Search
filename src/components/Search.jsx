@@ -1,16 +1,27 @@
 import React, { useState } from "react";
+import { getPhotosMatchingTag } from '../helpers/api_helpers';
 
-const Search = () => {
+const Search = ({ setImages }) => {
   const [userInput, setUserInput] = useState("");
-  const [tagTitle, setTagTitle] = useState("");
+
+  const getPhotos = () => {
+    getPhotosMatchingTag(userInput)
+    .then(images => {
+      setImages(images);
+    })
+    .catch(err => console.log(err));
+  }
 
   const handleSubmit = event => {
     event.preventDefault();
+    getPhotos();
+    setUserInput('');
   };
 
   const onChange = event => {
     setUserInput(event.target.value);
   };
+
   return (
     <div className="card card-body mb-4 p-4">
     <h2 className="display-4 text-center">
@@ -18,7 +29,7 @@ const Search = () => {
     </h2>
     <p className="lead text-center">Get the images for any tag</p>
     <form onSubmit={handleSubmit}>
-      <div className="form-group">
+      <div className="input-group">
         <input
           type="text"
           className="form-control form-control-lg"
@@ -27,10 +38,10 @@ const Search = () => {
           value={userInput}
           onChange={onChange}
         />
-      </div>
-      <button className="btn btn-primary btn-lg btn-block mb-5" type="submit">
+      <button className="btn btn-primary btn-lg btn-block" type="submit">
         Get Images
       </button>
+      </div>
     </form>
   </div>
   )
