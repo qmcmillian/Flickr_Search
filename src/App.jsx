@@ -1,20 +1,36 @@
-import React, { useState }from 'react';
+import React, { useState, useEffect }from 'react';
 import NavBar from './components/Navbar';
 import Search from './components/Search';
 import Feed from './components/Feed';
-import Pagination from './components/Pagination';
+import  { getPhotosMatchingTag } from './helpers/api_helpers';
+import ReactPaginate from 'react-paginate';
 
 const App = () => {
   const [images, setImages] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [imagesPerPage, setImagesPerPage] = useState(10);
+  const [pageNumber, setPageNumber] = useState(0);
 
-  // Get Current Images
-  const indexOfLastImage = currentPage * imagesPerPage;
-  const indexOfFirstImage = indexOfLastImage - imagesPerPage;
-  const currentImages = images.slice(indexOfFirstImage, indexOfLastImage);
-  // Change Page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const imagesPerPage = 10;
+  const pagesVisited = pageNumber * imagesPerPage;
+
+  const displayImages = images.slice(pagesVisited, pagesVisited + imagesPerPage)
+  const pageCount = Math.ceil(images.length / imagesPerPage);
+
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+    document.body.style.overflow = 'auto'
+
+  }
+
+  const scrollPosition =  window.scrollY
+  console.log(scrollPosition)
+
+  useEffect(() => {
+    getPhotosMatchingTag()
+    .then(images => {
+      setImages(images);
+    })
+    .catch(err => console.log(err));
+  }, []);
 
   return (
     <div>
@@ -23,15 +39,18 @@ const App = () => {
         setImages={setImages}
       />
       { images.length === 0 ? null :
-        <div>
-          <Feed images={currentImages}/>
-          <Pagination
-            imagesPerPage={imagesPerPage}
-            totalImages={images.length}
-            paginate={paginate}
-            />
-        </div>
+        <>
+          <Feed images={displayImages}/>
+        </>
       }
+      <ReactPaginate
+        previousLabel={'<'}
+        nextLabel={'>'}
+        pageCount={pageCount}
+        onPageChange={changePage}
+        containerClassName={'pagination'}
+        activeClassName={'active'}
+      />
     </div>
   )
 };
